@@ -153,6 +153,56 @@ public class Tree {
         return store;
     }
 
+    public Tree find(int index) {
+        if (this.isEmpty()) {
+            return this;
+        }
+
+        for (int i = 0; i < index; i++) {
+
+            boolean found = false;
+            Tree store = this;
+            this.markVisited(this);
+
+            if (this.valueEquals(val)) {
+                found = true;
+                store = this;
+            }
+
+            if (!found && (this.left != null && !this.left.visited)) { // check left
+                store = this.left.find(index);
+            }
+            if (!found && (this.right != null && !this.right.visited)) { // check right
+                store = this.right.find(index);
+            }
+        }
+        return store;
+    }
+
+    public int getIndex(int val) {
+        if (this.isEmpty()) {
+            return -1;
+        }
+        boolean found = false;
+        int index = 1;
+        this.markVisited(this);
+
+        if (this.valueEquals(val)) {
+            found = true;
+            index++;
+        }
+
+        if (!found && (this.left != null && !this.left.visited)) { // check left
+            index++;
+            index = this.left.getIndex(val);
+        }
+        if (!found && (this.right != null && !this.right.visited)) { // check right
+            index++;
+            index = this.right.getIndex(val);
+        }
+        return index;
+    }
+
     public int depth() {
         if (this.isEmpty()) {
             return 0;
