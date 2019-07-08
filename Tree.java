@@ -1,59 +1,65 @@
+import components.queue.Queue;
+import components.queue.Queue1L;
+
 public class Tree {
     private int value;
 
     private Tree left;
     private Tree right;
-    boolean visited;
+    private boolean visited;
+    private int index;
 
     Tree() {
         this.left = this;
         this.right = this;
+        this.visited = false;
+        this.index = 1;
     }
 
     Tree(int value) {
         this.value = value;
         this.left = null;
         this.right = null;
+        this.visited = false;
+        this.index = 1;
     }
 
     Tree(int value, Tree left, Tree right) {
         this.value = value;
         this.left = left;
         this.right = right;
-    }
-
-    public void addChild(Tree child, Direction d) {
-        if (d.equals(Direction.LEFT)) {
-            this.left = child;
-        } else if (d.equals(Direction.RIGHT)) {
-            this.right = child;
-        }
-    }
-
-    public void add(Tree child) {
-        if (this.isEmpty()) {
-            this.clearTree();
-            this.setValue(child.value);
-        } else {
-            if (this.visit(Direction.LEFT) == null) {
-                this.left = child;
-            } else if (this.visit(Direction.RIGHT) == null) {
-                this.right = child;
-            }
-        }
+        this.visited = false;
+        this.index = 1;
     }
 
     public void add(int val) {
         if (this.isEmpty()) {
             this.clearTree();
             this.setValue(val);
+            this.index = 1;
         } else {
             if (this.visit(Direction.LEFT) == null) {
                 this.left = new Tree(val);
+                this.left.index = this.index + 1;
             } else if (this.visit(Direction.RIGHT) == null) {
                 this.right = new Tree(val);
+                this.right.index = this.left.index + 1;
             }
         }
+    }
+
+    public Queue<Integer> logIndexes() {
+        Queue<> indexQueue = new Queue1L<Integer>();
+        Tree n = new Tree();
+        if (this.left.isLeaf()) {
+            indexQueue.enqueue();
+        }
+        if (!this.left.isLeaf()) {
+            indexQueue.append(this.left.logIndexes());
+        } else if (!this.right.isLeaf()) {
+
+        }
+        return indexQueue;
     }
 
     public Tree visit(Direction d) {
@@ -99,17 +105,20 @@ public class Tree {
     @Override
     public String toString() {
         if (this.isEmpty()) {
-            return "()";
+            return "([-1])";
         }
-        if (this.isLeaf()) {
-            return "" + this.value;
+        if (this.isLeaf() && this.index == 1) {
+            return "([" + this.index + "]" + this.value + ")";
+        } else if (this.isLeaf()) {
+            return "[" + this.index + "]" + this.value;
         } else {
-            return "(" + this.value + ", "
+            return "([" + this.index + "]" + this.value + ", "
                     + ((this.left != null) ? this.left.toString() : "DNE")
                     + ", "
                     + ((this.right != null) ? this.right.toString() : "DNE")
                     + ")";
         }
+
     }
 
     public boolean contains(int val) {
@@ -153,32 +162,28 @@ public class Tree {
         return store;
     }
 
-    public Tree find(int index) {
-        if (this.isEmpty()) {
-            return this;
-        }
-
-        for (int i = 0; i < index; i++) {
-
-            boolean found = false;
-            Tree store = this;
-            this.markVisited(this);
-
-            if (this.valueEquals(val)) {
-                found = true;
-                store = this;
-            }
-
-            if (!found && (this.left != null && !this.left.visited)) { // check left
-                store = this.left.find(index);
-            }
-            if (!found && (this.right != null && !this.right.visited)) { // check right
-                store = this.right.find(index);
-            }
-        }
-        return store;
-    }
-
+    /*
+     * public Tree find(int indexWanted, int indexFrom) { Tree examined =
+     * toNode(indexFrom); if (this.isEmpty()) { return this; } boolean found =
+     * false;
+     *
+     * while (indexFrom < indexWanted) { examined = this.find(indexWanted,
+     * indexFrom++); // visit next node }
+     *
+     * for (int i = 0; i < indexWanted; i++) {
+     *
+     * Tree store = this; this.markVisited(this); // visit next node }
+     *
+     * Tree store = this;
+     *
+     * if (!found && (this.left != null && !this.left.visited)) { // check left
+     * store = this.left.find(indexWanted); } if (!found && (this.right != null
+     * && !this.right.visited)) { // check right store =
+     * this.right.find(indexWanted); } return store;
+     *
+     * }
+     *
+     */
     public int getIndex(int val) {
         if (this.isEmpty()) {
             return -1;
